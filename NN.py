@@ -12,6 +12,8 @@ from model import Model
 from optimizers import Optimizer_SGD,Optimizer_Adam
 from dropout import Layer_Dropout
 from batchnorm import Layer_BatchNorm
+from gradcheck import gradient_check
+from tensor import Tensor
 
 dataset_path=input("Enter dataset path:")
 label_column=input("Enter label column name:")
