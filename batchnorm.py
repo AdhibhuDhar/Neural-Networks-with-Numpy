@@ -10,7 +10,7 @@ class Layer_BatchNorm:
         self.epsilon=epsilon
         self.gamma=np.ones((1,n_features)) #scale
         self.beta=np.zeros((1,n_features)) #shift
-    def forward(self,inputs):
+    def forward(self,inputs,training=True):
         self.inputs=inputs
         self.mean=np.mean(inputs,axis=0,keepdims=True)
         self.var=np.var(inputs,axis=0,keepdims=True)
@@ -30,5 +30,5 @@ class Layer_BatchNorm:
         self.dinputs=dx_hat*std_inv+dvar*2*x_mu/N+dmean/N
         self.dgamma=np.sum(dvalues*self.x_hat,axis=0,keepdims=True)
         self.dbeta=np.sum(dvalues,axis=0,keepdims=True)
-        
+
 

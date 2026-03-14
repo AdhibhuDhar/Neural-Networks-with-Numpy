@@ -9,22 +9,22 @@ def gradient_check(model,X,y,epsilon=1e-5):
     #backprop
     model.backward(output,y)
     for layer in model.layers:
-        if not hasattr(layer,"weights"):
+        if not hasattr(layer,"weights"):#skip layer without weights
             continue
         for i in range(layer.weight.shape[0]):
             for j in range(layer.weight.shape[1]):
                 original=layer.weights[i,j]
                 #w+epsilon
-                layer.weights[i,j]=original+epsilon
+                layer.weights[i,j]=original+epsilon#slightly increase wt
                 out_plus=model.forward(X)
-                loss_plus=model.loss.calculate(out_plus,y)
+                loss_plus=model.loss.calculate(out_plus,y)#loss when wt increased
                 #w-epsilon
-                layer.weights[i,j]=original-epsilon
+                layer.weights[i,j]=original-epsilon#slightly decrease wt
                 out_minus=model.forward(X)
-                loss_minus=model.loss.calculate(out_minus,y)
+                loss_minus=model.loss.calculate(out_minus,y)#loss when wt decreased
                 #restore
                 layer.weights[i,j]=original
-                numerical_grad=(loss_plus-loss_minus)/(2*epsilon)
+                numerical_grad=(loss_plus-loss_minus)/(2*epsilon) #est true derivative
                 backprop_grad=layer.dweights[i,j]
                 diff=abs(numerical_grad-backprop_grad)
                 if  diff > 1e-4:

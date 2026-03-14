@@ -6,6 +6,11 @@ from losses import Loss_CategoricalCrossEntropy,Activation_Softmax_Loss_Categori
 class Model:
     def __init__(self):
         self.layers=[]
+        self.training=True
+    def train_mode(self):
+        self.training=True
+    def eval_mode(self):
+        self.training
 
     def add(self,layer):
         #self.layers.append(layer)
@@ -32,9 +37,8 @@ class Model:
         #softmaxx+CE
         self.loss_activation.backward(output,y)
         self.layers[-1].dinputs=self.loss_activation.dinputs
-        for layer in reversed(self.layers): #skip last layer
-            layer.backward(dinputs)
-            #dinputs=layer.dinputs
+        for layer in reversed(self.layers[:-1]):
+            layer.backward(layer.dinputs)
     
     def train(self,dataset,epochs=10000,batch_size=32):
         loader=DataLoader(dataset,batch_size=batch_size,shuffle=True)
@@ -43,9 +47,7 @@ class Model:
             for X_batch,y_batch in loader:
                 output=self.forward(X_batch)#fwd
                 loss=self.loss.calculate(output,y_batch)#loss
-                predictions=np.argmax(output,axis=1)#pred
-                if len(y_batch.shape)==2:
-                    y_batch=np.argmax(y_batch,axis=1)
+                predictions=np.argmax(output,axis=1)
                 accuracy=np.mean(predictions==y_batch)
                 self.backward(output,y_batch)#bwd
                 for layer in self.layers:#update params

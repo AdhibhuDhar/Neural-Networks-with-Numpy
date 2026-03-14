@@ -2,8 +2,11 @@ import numpy as np
 class Layer_Dropout:
     def __init__(self,rate):
         self.rate=1-rate #eg 0.2 rate meas 20% neuron switched off
-    def forward(self,inputs):
+    def forward(self,inputs,training=True):
         self.inputs=inputs
+        if not training: #training->dropout active,inference->dropout disabled
+            self.output=inputs
+            return
         #make mask
         self.binary_mask=np.random.binomial(
             1,self.rate,size=inputs.shape

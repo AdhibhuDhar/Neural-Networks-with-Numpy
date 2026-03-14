@@ -41,6 +41,14 @@ num_features=train_dataset.n_features
 num_classes=len(np.unique(y_train))
 
 model=Model()
+#testing grad check
+model.set(
+    loss=Loss_CategoricalCrossEntropy(),
+    optimizer=Optimizer_Adam(learning_rate=0.001)
+)
+gradient_check(model,X_train[:5],y_train[:5])
+model.train(train_dataset,epochs=10000,batch_size=32)
+model.evaluate(test_dataset)
 model.add(Layer_Dense(num_features,64))
 model.add(Layer_BatchNorm(64))
 model.add(Activation_ReLU())#ReLU provides active neuorns
