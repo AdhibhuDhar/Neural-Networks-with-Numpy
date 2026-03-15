@@ -7,6 +7,10 @@ class Model:
     def __init__(self):
         self.layers=[]
         self.training=True
+        self.history={
+            "loss":[],
+            "accuracy":[]
+        }
     def train_mode(self):
         self.training=True
     def eval_mode(self):
@@ -42,6 +46,8 @@ class Model:
     
     def train(self,dataset,epochs=10000,batch_size=32):
         loader=DataLoader(dataset,batch_size=batch_size,shuffle=True)
+        self.history["loss"].append(loss)
+        self.history["accuracy"].append(accuracy)
         for epoch in range(epochs):
            
             for X_batch,y_batch in loader:
@@ -70,4 +76,39 @@ class Model:
         predictions=np.argmax(output,axis=1)
         accuracy=np.mean(predictions==y)
         print("Test Accuracy:",accuracy)
+    def save(self,filepath):
+        params={}
+        for i,layer in enumerate(self.layers):
+            if hasattr(layer,"weights"):
+                params[f"W{i}"]=layer.weights
+                params[f"b{i}"]=layer.biases
+            if hasattr(layer,"gamma"):
+                params[f"gamma{i}"]=layer.gamma
+                params[f"beta{i}"]=layer.beta
+            np.savez(filepath,**params)
+    def load(self,filepath):
+        data=np.load(filepath)
+        for i,layer in enumerate(self.layers):
+            if hasattr(layer,"weights"):
+                layer.weights=data[f"W{i}"]
+                layer.biases=data[f"b{i}"]
+            if hasattr(layer,"gamma"):
+                layer.gamma=data[f"gamma{i}"]
+                layer.beta=data[f"beta{i}"]
+    def plot_training(self):
+        import matplotlib.pyplot as plt
+        plt.figure(figsize=(10,4))
+        plt.subplot(1,2,1)
+        plt.plot(self.history["loss"])
+        plt.title("Training Loss")
+        plt.xlabel("Checkpoints")
+        plt.ylabel("Loss")
+        plt.subplot(1,2,2)
+        plt.plot(self.history["accuracy"])
+        plt.title("Training Accuracy")
+        plt.xlabel("Checkpoints")
+        plt.ylabel("Accuracy")
+        plt.tight_layout()
+        plt.show()
+            
 

@@ -14,6 +14,8 @@ from dropout import Layer_Dropout
 from batchnorm import Layer_BatchNorm
 from gradcheck import gradient_check
 from tensor import Tensor
+from experiment_logger import ExperimentLogger
+logger=ExperimentLogger()
 
 dataset_path=input("Enter dataset path:")
 label_column=input("Enter label column name:")
@@ -63,6 +65,21 @@ model.set(
 
 
 model.train(train_dataset,epochs=10000,batch_size=32)
+logger.log(
+    config={
+        "layers":[64],
+        "optimizer":["Adam"],
+        "lr":0.001,
+        "dropout":0.2
+    },
+    results={
+        "final_loss":model.history["loss"][-1],
+        "final_accuracy":model.history["accuracy"][-1]
+    }
+)
+model.plot_training()
+model.save("model_weights.npz")
+#load=model.load("model_weights.npz")
 model.evaluate(test_dataset)
 
 
